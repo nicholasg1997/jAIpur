@@ -400,9 +400,9 @@ class JaipurEnv(gym.Env):
         for i_good_idx, good_type_val in GOOD_IDX_TO_CARD.items():
             hand_good_fullness[i_good_idx] = p.count_good(good_type_val) / HAND_LIMIT if HAND_LIMIT > 0 else 0.0
         cim = np.zeros(MARKET_SIZE, dtype=np.float32)
-        camels_count = sum([1 for c in self.game.market.market_cards if c == CardType.CAMEL])
-        if camels_count > 0:
-            cim[:camels_count-1] = 1.0
+        for i, card in enumerate(self.game.market.get_cards()):
+            if card == CardType.CAMEL:
+                cim[i] = 1.0
 
         return {"market": self.game.market.get_market_matrix().astype(np.float32),
                 "camels_in_market": cim,
