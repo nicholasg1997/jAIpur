@@ -1,0 +1,80 @@
+import enum
+import numpy as np
+
+class CardType(enum.Enum):
+    CAMEL = "Camel"
+    LEATHER = "Leather"
+    SPICE = "Spice"
+    CLOTH = "Cloth"
+    SILVER = "Silver"
+    GOLD = "Gold"
+    DIAMOND = "Diamond"
+
+    def __str__(self):
+        return self.value
+
+
+CARD_IDX = {
+    CardType.CAMEL: 0, CardType.LEATHER: 1, CardType.SPICE: 2, CardType.CLOTH: 3,
+    CardType.SILVER: 4, CardType.GOLD: 5, CardType.DIAMOND: 6
+}
+
+GOOD_IDX_TO_CARD = {
+    0: CardType.LEATHER, 1: CardType.SPICE, 2: CardType.CLOTH,
+    3: CardType.SILVER, 4: CardType.GOLD, 5: CardType.DIAMOND
+}
+
+NUM_GOOD_TYPES = len(GOOD_IDX_TO_CARD);
+NUM_CARD_TYPES = len(CARD_IDX)
+
+TOTAL_CARD_COUNTS = {
+    CardType.CAMEL: 11, CardType.LEATHER: 10, CardType.SPICE: 8, CardType.CLOTH: 8,
+    CardType.SILVER: 6, CardType.GOLD: 6, CardType.DIAMOND: 6
+}
+
+INITIAL_MARKET_CAMELS = 3
+MARKET_SIZE = 5
+HAND_LIMIT = 7
+MAX_CAMELS_PLAYER_CAN_HAVE = TOTAL_CARD_COUNTS[CardType.CAMEL]
+MIN_SELL = {
+    CardType.LEATHER: 1, CardType.SPICE: 1, CardType.CLOTH: 1,
+    CardType.SILVER: 2, CardType.GOLD: 2, CardType.DIAMOND: 2
+}
+GOODS_TOKENS_VALUES = {
+    CardType.LEATHER: [4, 3, 2, 1, 1, 1, 1, 1, 1], CardType.SPICE: [5, 3, 3, 2, 2, 1, 1],
+    CardType.CLOTH: [5, 3, 3, 2, 2, 1, 1], CardType.SILVER: [5, 5, 5, 5, 5],
+    CardType.GOLD: [6, 6, 5, 5, 5], CardType.DIAMOND: [7, 7, 5, 5, 5],
+}
+BONUS_TOKENS_CONFIG = {
+    3: [1, 1, 2, 2, 3, 3], 4: [4, 4, 5, 5, 6, 6], 5: [8, 8, 9, 10, 10]
+}
+DEPLETED_STACKS_END_CONDITION = 3
+
+
+REWARD_SCALING_FACTOR_SELL_POINTS = 0.5
+K1_SELLABLE_FACTOR = 0.7
+K2_UNSELLABLE_FACTOR = 0.3
+SCORE_DIFFERENCE_REWARD_FACTOR = 0.25
+
+BONUS_TOKEN_POTENTIAL_REWARDS = {
+    3: np.mean(BONUS_TOKENS_CONFIG[3]) * 1.5,
+    4: np.mean(BONUS_TOKENS_CONFIG[4]) * 1.5,
+    5: np.mean(BONUS_TOKENS_CONFIG[5]) * 1.5,
+}
+
+CAMEL_VALUE_IN_HAND_HEURISTIC = 0.001
+MARKET_VALUE_PENALTY_FACTOR = 0.05
+REWARD_FACTOR_DELTA_HAND_HEURISTIC = 0.3
+BASE_REWARD_ACTION_SUCCESS = 0.005  # 0.02
+
+PENALTY_INVALID_ACTION = -1.5
+VALID_N_FOR_N_EXCHANGE_CONSTRUCTION_BONUS = 0.005  # 0.25
+REWARD_FACTOR_CAMEL_TAKEN = 0.001
+BASE_REWARD_FREE_SINGLE_TAKE_SUCCESS = 0.005  # 0.01
+BASE_REWARD_N_FOR_N_EXCHANGE_SUCCESS = 0.005  # 0.01
+ACTION_COST = 0.01
+
+TERMINAL_WIN_BONUS = 30.0
+TERMINAL_LOSS_PENALTY = -30.0
+
+MAX_CONSECUTIVE_INVALID_MOVES_PER_TURN = 3
