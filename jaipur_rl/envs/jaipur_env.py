@@ -37,7 +37,7 @@ class JaipurEnv(gym.Env):
         })
 
         self.observation_space = gym.spaces.Dict({
-            "market": gym.spaces.Box(low=0, high=1, shape=(MARKET_SIZE + 1, NUM_CARD_TYPES), dtype=np.float32),
+            "market": gym.spaces.Box(low=0, high=1, shape=(MARKET_SIZE, NUM_CARD_TYPES), dtype=np.float32),
             "camels_in_market": gym.spaces.Box(low=0, high=1, shape=(MARKET_SIZE,), dtype=np.float32),
             "hand": gym.spaces.Box(low=0, high=1, shape=(HAND_LIMIT, NUM_GOOD_TYPES), dtype=np.float32),
             "score": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
@@ -214,9 +214,6 @@ class JaipurEnv(gym.Env):
         hand_mask[:ap.hand_size()] = 1
 
         if "exchange_hand_give_indices" in ad:
-            print(ad)
-            print(ad["exchange_hand_give_indices"])
-            print(hand_mask)
             ad["exchange_hand_give_indices"] *= hand_mask  # Ensure indices are valid
 
         if mat == 0:  # Take Camels
@@ -402,8 +399,10 @@ class JaipurEnv(gym.Env):
         hand_fullness[:len(p.hand)] = 1.0
         for i_good_idx, good_type_val in GOOD_IDX_TO_CARD.items():
             hand_good_fullness[i_good_idx] = p.count_good(good_type_val) / HAND_LIMIT if HAND_LIMIT > 0 else 0.0
-        cim = np.zeros(MARKET_SIZE + 1, dtype=np.float32)
-        cim[int(sum([1 for c in self.game.market.market_cards if c == CardType.CAMEL]))] = 1.0
+        cim = np.zeros(MARKET_SIZE, dtype=np.float32)
+        camels_count = sum([1 for c in self.game.market.market_cards if c == CardType.CAMEL])
+        if camels_count > 0:
+            cim[:camels_count-1] = 1.0
 
         return {"market": self.game.market.get_market_matrix().astype(np.float32),
                 "camels_in_market": cim,

@@ -1,6 +1,3 @@
-import multiprocessing as mp
-mp.set_start_method('spawn', force=True)
-
 from jaipur_rl.envs.jaipur_env import JaipurEnv
 from sb3_plus import MultiOutputPPO, make_multioutput_env
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
@@ -24,7 +21,7 @@ def train(steps: int = 1_000_000, n_envs: int = 16,
     vec_env = make_multioutput_env(
         JaipurEnv,
         n_envs=n_envs,
-        vec_env_cls=SubprocVecEnv
+        vec_env_cls=DummyVecEnv
     )
 
     lr_schedule = linear_schedule(init_lr, min_lr)
@@ -39,7 +36,7 @@ def train(steps: int = 1_000_000, n_envs: int = 16,
         tensorboard_log=tensorboard_log,
         policy_kwargs=dict(
             net_arch=dict(pi=pi_network, vf=vf_network),
-        )
+        ),
     )
 
     ent_coef_callback = EntCoefSchedulerCallback(
@@ -70,7 +67,7 @@ if __name__ == "__main__":
 
     train(
         steps=25_000_000,
-        n_envs=8,
+        n_envs=4,
         init_lr=1e-4,
         min_lr=1e-6,
         init_ent_coef=0.05,
@@ -78,7 +75,7 @@ if __name__ == "__main__":
         ent_coef_frac=0.4,
         pi_network=[256, 128],
         vf_network=[256, 256],
-        tensorboard_log="./jaipur_tensorboard/",
+        tensorboard_log="./tensorboard_logs/",
         log_name="Jaipur_tb",
-        save_path="models",
+        save_path="./models/",
     )

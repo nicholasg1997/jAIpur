@@ -1,6 +1,4 @@
 from jaipur_rl.training.trainer import train
-import multiprocessing as mp
-mp.set_start_method('spawn', force=True)
 
 
 if __name__ == "__main__":
