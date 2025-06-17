@@ -5,7 +5,7 @@ from jaipur_rl.training.schedulers import linear_schedule, EntCoefSchedulerCallb
 from datetime import datetime
 from jaipur_rl.training.callbacks import InfoCallback
 
-def train(steps: int = 1_000_000, n_envs: int = 16,
+def train(steps: int = 1_000_000, n_envs: int = 8,
           init_lr: float = 1e-4, min_lr: float = 1e-6,
           init_ent_coef: float = 0.05, final_ent_coef: float = 0.005, ent_coef_frac: float = 0.4,
           pi_network=None, vf_network=None,
@@ -21,7 +21,7 @@ def train(steps: int = 1_000_000, n_envs: int = 16,
     vec_env = make_multioutput_env(
         JaipurEnv,
         n_envs=n_envs,
-        vec_env_cls=DummyVecEnv
+        vec_env_cls=SubprocVecEnv
     )
 
     lr_schedule = linear_schedule(init_lr, min_lr)
@@ -67,13 +67,13 @@ if __name__ == "__main__":
 
     train(
         steps=25_000_000,
-        n_envs=4,
+        n_envs=16,
         init_lr=1e-4,
         min_lr=1e-6,
         init_ent_coef=0.05,
         final_ent_coef=0.005,
         ent_coef_frac=0.4,
-        pi_network=[256, 128],
+        pi_network=[256, 256],
         vf_network=[256, 256],
         tensorboard_log="./tensorboard_logs/",
         log_name="Jaipur_tb",

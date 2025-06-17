@@ -25,7 +25,7 @@ class JaipurEnv(gym.Env):
         self.game = JaipurGame(seed=self.seed_val)
         self.players = [Player("P1"), Player("P2")]
         self.current_step = 0
-        self.current_player_idx = 0
+        self.current_player_idx = self._rng.choice([0, 1])
 
         self.action_space = gym.spaces.Dict({
             "main_action_type": gym.spaces.Discrete(3),  # 0:TakeCamels, 1:Sell, 2:TakeSpecificOrExchange
@@ -417,7 +417,7 @@ class JaipurEnv(gym.Env):
                 "deck_pct": self.game.deck.get_deck_percentages().astype(np.float32),
                 "known_opp_cards": kov,
                 "hand_size": hand_fullness,
-                "hand_good_fullness": hand_good_fullness,
+                # "hand_good_fullness": hand_good_fullness,
                 "opp_hand_size": np.array([opp.hand_size() / HAND_LIMIT if HAND_LIMIT > 0 else 0.0], dtype=np.float32),
                 "opp_herd_size": np.array(
                     [opp.herd / MAX_CAMELS_PLAYER_CAN_HAVE if MAX_CAMELS_PLAYER_CAN_HAVE > 0 else 0.0],
