@@ -7,7 +7,7 @@ The market is responsible for managing the cards available for players to take.
 
 import numpy as np
 from typing import List, Optional
-from jaipur_rl.config import CardType, INITIAL_MARKET_CAMELS, MARKET_SIZE, NUM_CARD_TYPES, CARD_IDX
+from configs.game_configs import CardType, INITIAL_MARKET_CAMELS, MARKET_SIZE, NUM_CARD_TYPES, CARD_IDX
 from jaipur_rl.game.deck import Deck
 
 

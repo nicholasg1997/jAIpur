@@ -6,7 +6,7 @@ The Tokens class is responsible for managing the tokens used in the game.
 """
 import copy
 
-from jaipur_rl.config import CardType, GOODS_TOKENS_VALUES, BONUS_TOKENS_CONFIG, NUM_GOOD_TYPES, GOOD_IDX_TO_CARD
+from configs.game_configs import CardType, GOODS_TOKENS_VALUES, BONUS_TOKENS_CONFIG, NUM_GOOD_TYPES, GOOD_IDX_TO_CARD
 import random
 from typing import List, Tuple, Any, Optional
 import numpy as np

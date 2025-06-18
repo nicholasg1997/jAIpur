@@ -9,7 +9,7 @@ import random
 import numpy as np
 from typing import List, Optional
 from collections import Counter
-from jaipur_rl.config import CardType, TOTAL_CARD_COUNTS, INITIAL_MARKET_CAMELS, CARD_IDX, NUM_CARD_TYPES
+from configs.game_configs import CardType, TOTAL_CARD_COUNTS, INITIAL_MARKET_CAMELS, CARD_IDX, NUM_CARD_TYPES
 
 
 class Deck:

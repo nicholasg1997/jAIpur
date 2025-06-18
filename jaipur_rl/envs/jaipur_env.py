@@ -6,11 +6,9 @@ The environment is responsible for managing the game state, handling actions, an
 """
 
 import gymnasium as gym
-import numpy as np
-import random
 from typing import Optional, Tuple, Dict, List
 from jaipur_rl.game.player import Player
-from jaipur_rl.config import *
+from configs.game_configs import *
 from jaipur_rl.game.jaipur_game import JaipurGame
 
 
@@ -49,7 +47,7 @@ class JaipurEnv(gym.Env):
             "deck_pct": gym.spaces.Box(low=0, high=1, shape=(NUM_CARD_TYPES,), dtype=np.float32),
             "known_opp_cards": gym.spaces.Box(low=0, high=1, shape=(NUM_GOOD_TYPES,), dtype=np.float32),
             "hand_size": gym.spaces.Box(low=0, high=1, shape=(HAND_LIMIT + 1,), dtype=np.float32),
-            "hand_good_fullness": gym.spaces.Box(low=0, high=1, shape=(NUM_GOOD_TYPES,), dtype=np.float32),
+            #"hand_good_fullness": gym.spaces.Box(low=0, high=1, shape=(NUM_GOOD_TYPES,), dtype=np.float32),
             "opp_hand_size": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "opp_herd_size": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "opp_score": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),

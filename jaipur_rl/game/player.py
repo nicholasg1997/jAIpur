@@ -5,7 +5,7 @@ This module contains the implementation of the player for the Jaipur game.
 The player is responsible for managing the player's hand, camels, and points.
 """
 
-from jaipur_rl.config import *
+from configs.game_configs import *
 from typing import List, Tuple, Dict, Set
 import numpy as np
 from jaipur_rl.game.tokens import TokenBank
