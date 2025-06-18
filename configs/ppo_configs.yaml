@@ -1,6 +1,6 @@
 # Training parameters
 training:
-  steps: 25000000
+  steps: 25_000_000
   n_envs: 16
 
 # Model Hyperparameters
