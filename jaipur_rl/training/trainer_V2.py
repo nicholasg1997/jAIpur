@@ -96,7 +96,7 @@ def train(config: dict):
                     )
 
 
-if __name__ == "__main__":
+def main():
     default_config_path = Path(__file__).resolve().parents[2] / "configs" / "ppo_configs.yaml"
     parser = argparse.ArgumentParser(description="Train Jaipur RL model with specified configuration.")
     parser.add_argument('--config', type=str, default=default_config_path,
@@ -108,4 +108,7 @@ if __name__ == "__main__":
         config = yaml.safe_load(file)
 
     print(f"Using configuration from {args.config}")
-    train(config)
+    #train(config)
+
+if __name__ == "__main__":
+    main()
