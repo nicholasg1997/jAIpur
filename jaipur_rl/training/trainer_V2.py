@@ -84,9 +84,9 @@ def train(config: dict):
                     n_envs=train_params['n_envs'],
                     init_lr=model_params['learning_rate']['initial'],
                     min_lr=model_params['learning_rate']['minimum'],
-                    init_ent_coef=model_params['ent_coef']['initial'],
-                    final_ent_coef=model_params['ent_coef']['final'],
-                    ent_coef_frac=model_params['ent_coef']['decay_fraction'],
+                    init_ent_coef=model_params['entropy_coefficient']['initial'],
+                    final_ent_coef=model_params['entropy_coefficient']['final'],
+                    ent_coef_frac=model_params['entropy_coefficient']['decay_fraction'],
                     pi_network=net_params['policy'],
                     vf_network=net_params['value'],
                     tensorboard_log=TENSORBOARD_LOG_DIR,
@@ -108,7 +108,7 @@ def main():
         config = yaml.safe_load(file)
 
     print(f"Using configuration from {args.config}")
-    #train(config)
+    train(config)
 
 if __name__ == "__main__":
     main()

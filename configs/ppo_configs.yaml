@@ -15,8 +15,8 @@ model:
 
 # Network Architecture
 network:
-  policy: [256, 256]
-  value: [256, 256]
+  policy: [512, 256]
+  value: [512, 256]
 
 # Logging and Saving
 paths:
