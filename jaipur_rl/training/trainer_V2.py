@@ -1,6 +1,6 @@
 from jaipur_rl.envs.jaipur_env import JaipurEnv
 from sb3_plus import MultiOutputPPO, make_multioutput_env
-from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 from jaipur_rl.training.schedulers import linear_schedule, EntCoefSchedulerCallback
 from datetime import datetime
 from jaipur_rl.training.callbacks import InfoCallback
@@ -28,7 +28,7 @@ def _internal_train(steps: int = 1_000_000, n_envs: int = 8,
     vec_env = make_multioutput_env(
         JaipurEnv,
         n_envs=n_envs,
-        vec_env_cls=DummyVecEnv
+        vec_env_cls=SubprocVecEnv
     )
 
     lr_schedule = linear_schedule(init_lr, min_lr)
