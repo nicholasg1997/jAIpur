@@ -14,10 +14,8 @@ import random
 
 class JaipurGame:
     def __init__(self, seed: Optional[int] = None):
-        deck_seed, token_seed = (random.Random(seed).randint(0, 2 ** 32 - 1), random.Random(seed).randint(0, 2 ** 32 - 1)) \
-            if seed else (None, None)
-        self.deck = Deck(seed=deck_seed)
-        self.token_bank = TokenBank(seed=token_seed)
+        self.deck = Deck(seed=seed)
+        self.token_bank = TokenBank(seed=seed)
         self.market = Market(self.deck)
 
     def reset(self, seed: Optional[int] = None):
@@ -29,7 +27,7 @@ class JaipurGame:
 
 
 if __name__ == "__main__":
-    game = JaipurGame(seed=123)
+    game = JaipurGame()
     game.reset(seed=456)
     print("Deck:", game.deck.cards)
     print("Market:", game.market.market_cards)

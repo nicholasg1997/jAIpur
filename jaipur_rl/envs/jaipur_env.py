@@ -339,12 +339,17 @@ class JaipurEnv(gym.Env):
 
                     score_difference = final_score[self.current_player_idx] - final_score[1 - self.current_player_idx]
                     current_step_reward += score_difference * SCORE_DIFFERENCE_REWARD_FACTOR
+                    current_step_reward += final_score[self.current_player_idx]
+                    current_step_reward += final_score[1 - self.current_player_idx]
+
             elif trunc:
                 final_score, winner = self._calculate_final_scores_and_winner()
                 inf["final_scores_on_truncate"] = final_score
                 inf["winner_on_truncate"] = f"P{winner + 1}" if winner is not None else "Tie"
                 score_difference = final_score[self.current_player_idx] - final_score[1 - self.current_player_idx]
                 current_step_reward += score_difference * SCORE_DIFFERENCE_REWARD_FACTOR
+                current_step_reward += final_score[self.current_player_idx]
+                current_step_reward += final_score[1 - self.current_player_idx]
 
             inf["P1_Final_Score"] = float(final_score[0])
             inf["P2_Final_Score"] = float(final_score[1])
