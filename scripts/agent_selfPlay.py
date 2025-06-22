@@ -4,7 +4,7 @@ from pathlib import Path
 
 env = JaipurEnv()
 model_base_path = Path(__file__).resolve().parents[1] / "models"
-model = MultiOutputPPO.load(model_base_path / "Jaipur_25.0M_scheduler_2025-06-20_18-23-16", env=None)
+model = MultiOutputPPO.load(model_base_path / "Jaipur_75.0M_scheduler_2025-06-21_20-23-16", env=None)
 trained_agent = model
 
 p1_scores = []
