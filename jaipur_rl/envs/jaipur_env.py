@@ -40,19 +40,21 @@ class JaipurEnv(gym.Env):
             "hand": gym.spaces.Box(low=0, high=1, shape=(HAND_LIMIT, NUM_GOOD_TYPES), dtype=np.float32),
             "score": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "good_counts_in_hand": gym.spaces.Box(low=0, high=1, shape=(NUM_GOOD_TYPES,), dtype=np.float32),
-            "goods_can_sell": gym.spaces.Box(low=0, high=1, shape=(NUM_GOOD_TYPES,), dtype=np.float32),
             "herd_count": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "token_fullness": gym.spaces.Box(low=0, high=1, shape=(NUM_GOOD_TYPES,), dtype=np.float32),
             "empty_token_stacks": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "deck_pct": gym.spaces.Box(low=0, high=1, shape=(NUM_CARD_TYPES,), dtype=np.float32),
             "known_opp_cards": gym.spaces.Box(low=0, high=1, shape=(NUM_GOOD_TYPES,), dtype=np.float32),
             "hand_size": gym.spaces.Box(low=0, high=1, shape=(HAND_LIMIT + 1,), dtype=np.float32),
-            #"hand_good_fullness": gym.spaces.Box(low=0, high=1, shape=(NUM_GOOD_TYPES,), dtype=np.float32),
             "opp_hand_size": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "opp_herd_size": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "opp_score": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
-            "action_mask": gym.spaces.Box(low=0, high=1, shape=(3,), dtype=np.int8),
-            "take_mask": gym.spaces.Box(low=0, high=1, shape=(MARKET_SIZE,), dtype=np.int8),
+            "action_mask": gym.spaces.Dict({
+                "main_action_type": gym.spaces.MultiBinary(3),
+                "sell_good_type_index": gym.spaces.MultiBinary(NUM_GOOD_TYPES),
+                "exchange_market_take_mask": gym.spaces.MultiBinary(MARKET_SIZE),
+                "exchange_hand_give_indices": gym.spaces.MultiBinary(HAND_LIMIT)
+            })
         })
 
         self.current_player: Player = self._get_current_player()
@@ -395,39 +397,46 @@ class JaipurEnv(gym.Env):
     def _get_obs(self) -> Dict:
         p = self.current_player
         opp = self._get_opponent()
-        kov = p.get_known_opp_cards_vector()
+
         hn = p.herd / MAX_CAMELS_PLAYER_CAN_HAVE if MAX_CAMELS_PLAYER_CAN_HAVE > 0 else 0.0
         hand_good_fullness = np.zeros(NUM_GOOD_TYPES, dtype=np.float32)
         hand_fullness = np.zeros(HAND_LIMIT + 1, dtype=np.float32)
-        hand_fullness[:len(p.hand)] = 1.0
+        hand_fullness[len(p.hand)] = 1.0
         for i_good_idx, good_type_val in GOOD_IDX_TO_CARD.items():
             hand_good_fullness[i_good_idx] = p.count_good(good_type_val) / HAND_LIMIT if HAND_LIMIT > 0 else 0.0
         cim = np.zeros(MARKET_SIZE, dtype=np.float32)
         for i, card in enumerate(self.game.market.get_cards()):
             if card == CardType.CAMEL:
                 cim[i] = 1.0
+        sell_mask = np.zeros(NUM_GOOD_TYPES, dtype=np.float32)
+        for i_good_idx, good_type_val in GOOD_IDX_TO_CARD.items():
+            if p.can_sell(good_type_val):
+                sell_mask[i_good_idx] = 1.0
 
         return {"market": self.game.market.get_market_matrix().astype(np.float32),
                 "camels_in_market": cim,
                 "hand": p.get_hand_matrix().astype(np.float32),
                 "score": np.array([p.total_score / 150.0], dtype=np.float32),
                 "good_counts_in_hand": np.array(list(p.good_counts_in_hand()), dtype=np.float32),
-                "goods_can_sell": np.array(list(p.goods_can_sell()), dtype=np.float32),
                 "herd_count": np.array([hn], dtype=np.float32),
                 "token_fullness": self.game.token_bank.get_token_fullness().astype(np.float32),
                 "empty_token_stacks": np.array([self.game.token_bank.count_depleted_stacks() /
                                                 DEPLETED_STACKS_END_CONDITION], dtype=np.float32),
                 "deck_pct": self.game.deck.get_deck_percentages().astype(np.float32),
-                "known_opp_cards": kov,
+                "known_opp_cards": p.get_known_opp_cards_vector(),
                 "hand_size": hand_fullness,
-                # "hand_good_fullness": hand_good_fullness,
                 "opp_hand_size": np.array([opp.hand_size() / HAND_LIMIT if HAND_LIMIT > 0 else 0.0], dtype=np.float32),
                 "opp_herd_size": np.array(
                     [opp.herd / MAX_CAMELS_PLAYER_CAN_HAVE if MAX_CAMELS_PLAYER_CAN_HAVE > 0 else 0.0],
                     dtype=np.float32),
                 "opp_score": np.array([opp.total_score / 150.0], dtype=np.float32),
-                "action_mask": self._get_action_mask(),
-                "take_mask": self._get_take_mask()}
+                "action_mask": {
+                    "main_action_type": self._get_action_mask(),
+                    "sell_good_type_index": sell_mask,
+                    "exchange_market_take_mask": self._get_take_mask(),
+                    "exchange_hand_give_indices": np.zeros(HAND_LIMIT, dtype=np.int8)
+                    },
+                }
 
     def _get_action_mask(self) -> np.ndarray:
         m = np.zeros(3, dtype=np.int8)
@@ -436,10 +445,8 @@ class JaipurEnv(gym.Env):
 
         if CardType.CAMEL in mc:
             m[0] = 1
-
         if any(p.can_sell(GOOD_IDX_TO_CARD[i]) for i in GOOD_IDX_TO_CARD):
             m[1] = 1
-
         market_non_camels = [card for card in mc if card != CardType.CAMEL]
         if market_non_camels:
             if p.hand_size() < HAND_LIMIT:
