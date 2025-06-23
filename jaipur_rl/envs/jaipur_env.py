@@ -50,8 +50,8 @@ class JaipurEnv(gym.Env):
             "opp_herd_size": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "opp_score": gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             "action_mask": gym.spaces.Dict({
-                "main_action_type": gym.spaces.MultiBinary(3),
-                "sell_good_type_index": gym.spaces.MultiBinary(NUM_GOOD_TYPES),
+                "main_action_type": gym.spaces.Box(low=0, high=1, shape=(3,), dtype=np.int8),
+                "sell_good_type_index": gym.spaces.Box(low=0, high=1, shape=(NUM_GOOD_TYPES,), dtype=np.int8),
                 "exchange_market_take_mask": gym.spaces.MultiBinary(MARKET_SIZE),
                 "exchange_hand_give_indices": gym.spaces.MultiBinary(HAND_LIMIT)
             })
@@ -398,6 +398,7 @@ class JaipurEnv(gym.Env):
         p = self.current_player
         opp = self._get_opponent()
 
+        # Hand and Market Information
         hn = p.herd / MAX_CAMELS_PLAYER_CAN_HAVE if MAX_CAMELS_PLAYER_CAN_HAVE > 0 else 0.0
         hand_good_fullness = np.zeros(NUM_GOOD_TYPES, dtype=np.float32)
         hand_fullness = np.zeros(HAND_LIMIT + 1, dtype=np.float32)
@@ -408,10 +409,20 @@ class JaipurEnv(gym.Env):
         for i, card in enumerate(self.game.market.get_cards()):
             if card == CardType.CAMEL:
                 cim[i] = 1.0
-        sell_mask = np.zeros(NUM_GOOD_TYPES, dtype=np.float32)
+
+        # action masks
+        main_action_mask = self._get_action_mask()
+
+        sell_mask = np.zeros(NUM_GOOD_TYPES, dtype=np.int8)
         for i_good_idx, good_type_val in GOOD_IDX_TO_CARD.items():
             if p.can_sell(good_type_val):
                 sell_mask[i_good_idx] = 1.0
+
+        market_take_mask = self._get_take_mask()
+
+        hand_give_mask = np.zeros(HAND_LIMIT, dtype=np.int8)
+        if p.hand_size() > 0:
+            hand_give_mask[:p.hand_size()] = 1
 
         return {"market": self.game.market.get_market_matrix().astype(np.float32),
                 "camels_in_market": cim,
@@ -431,10 +442,10 @@ class JaipurEnv(gym.Env):
                     dtype=np.float32),
                 "opp_score": np.array([opp.total_score / 150.0], dtype=np.float32),
                 "action_mask": {
-                    "main_action_type": self._get_action_mask(),
+                    "main_action_type": main_action_mask,
                     "sell_good_type_index": sell_mask,
-                    "exchange_market_take_mask": self._get_take_mask(),
-                    "exchange_hand_give_indices": np.zeros(HAND_LIMIT, dtype=np.int8)
+                    "exchange_market_take_mask": market_take_mask,
+                    "exchange_hand_give_indices": hand_give_mask
                     },
                 }
 
