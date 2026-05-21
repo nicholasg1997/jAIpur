@@ -8,7 +8,7 @@ model:
   learning_rate:
     initial: 0.0001
     minimum: 0.000001
-  entropy_coefficient:
+  ent_coef:
     initial: 0.05
     final: 0.001
     decay_fraction: 0.3

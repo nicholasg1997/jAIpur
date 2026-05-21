@@ -108,7 +108,7 @@ def main():
         config = yaml.safe_load(file)
 
     print(f"Using configuration from {args.config}")
-    #train(config)
+    train(config)
 
 if __name__ == "__main__":
     main()

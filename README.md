@@ -51,12 +51,14 @@ python scripts/train_agent.py
 
 Trained models are saved to the `models/` directory by default.
 
-### Evaluation & Play (Coming Soon)
+## Evaluation Framework
 
-- **Test Agent vs. Itself:**  
-  Scripts to evaluate a trained agent against itself or other agents are coming soon.
-- **Play Against the Agent:**  
-  Play Jaipur against your trained agent via CLI or GUI (in development).
+We provide a rollout-based evaluation pipeline for trained agents.
+
+### Evaluate a trained model
+
+```bash
+python scripts/evaluate_agent.py --model path/to/model.zip --episodes 50
 
 ## Project Structure
 
